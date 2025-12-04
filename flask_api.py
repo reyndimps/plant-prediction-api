@@ -39,6 +39,11 @@ def load_models():
     global rf_model, le_seed, le_soil, dataset_df, model_loaded
     
     try:
+        # Debug: Print current directory and files
+        print(f"BASE_DIR: {BASE_DIR}")
+        print(f"MODEL_DIR: {MODEL_DIR}")
+        print(f"Files in directory: {os.listdir(BASE_DIR)}")
+        
         # Model file paths
         readiness_model_path = os.path.join(MODEL_DIR, 'rf_readiness_model.pkl')
         seed_encoder_path = os.path.join(MODEL_DIR, 'label_encoder_seed.pkl')
