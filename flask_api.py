@@ -43,7 +43,10 @@ def load_models():
         readiness_model_path = os.path.join(MODEL_DIR, 'rf_readiness_model.pkl')
         seed_encoder_path = os.path.join(MODEL_DIR, 'label_encoder_seed.pkl')
         soil_encoder_path = os.path.join(MODEL_DIR, 'label_encoder_soil.pkl')
-        dataset_path = os.path.join(BASE_DIR, '../../../storage/app/plant_readiness_dataset.csv')
+        # Try dataset in same directory first (for Railway), then Laravel path (for local)
+        dataset_path = os.path.join(BASE_DIR, 'plant_readiness_dataset.csv')
+        if not os.path.exists(dataset_path):
+            dataset_path = os.path.join(BASE_DIR, '../../../storage/app/plant_readiness_dataset.csv')
         
         # Check if files exist
         if not os.path.exists(readiness_model_path):
