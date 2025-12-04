@@ -343,6 +343,9 @@ def predict():
         }), 500
 
 
+# Load models when the module is imported (for gunicorn)
+load_models()
+
 if __name__ == '__main__':
     import os
     
@@ -350,9 +353,6 @@ if __name__ == '__main__':
     print("Plant Readiness Prediction API")
     print("Loading models exported from Google Colab...")
     print("=" * 70)
-    
-    # Try to load models, but start server anyway
-    load_models()
     
     port = int(os.environ.get('PORT', 5000))
     is_production = os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('RENDER')
@@ -364,6 +364,7 @@ if __name__ == '__main__':
         print(f"📍 Development mode - API at: http://127.0.0.1:{port}")
     
     print("📡 Endpoints:")
+    print("   - GET  /         - API info")
     print("   - GET  /health      - Health check")
     print("   - GET  /model-info  - Model information")
     print("   - POST /predict     - Make prediction")
