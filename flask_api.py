@@ -176,6 +176,22 @@ def calculate_days_until_ready(seed_type, age_weeks):
     return 0
 
 
+@app.route('/', methods=['GET'])
+def root():
+    """Root endpoint - shows API is running"""
+    return jsonify({
+        'message': 'Plant Readiness Prediction API is running!',
+        'status': 'online',
+        'model_loaded': model_loaded,
+        'endpoints': {
+            'health': '/health',
+            'model_info': '/model-info',
+            'predict': '/predict (POST)'
+        },
+        'version': '1.0.0'
+    })
+
+
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -335,38 +351,36 @@ if __name__ == '__main__':
     print("Loading models exported from Google Colab...")
     print("=" * 70)
     
-    if load_models():
-        port = int(os.environ.get('PORT', 5000))
-        is_production = os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('RENDER')
-        
-        print("\n🚀 Starting Flask API server...")
-        if is_production:
-            print(f"📍 Production mode - Port: {port}")
-        else:
-            print(f"📍 Development mode - API at: http://127.0.0.1:{port}")
-        
-        print("📡 Endpoints:")
-        print("   - GET  /health      - Health check")
-        print("   - GET  /model-info  - Model information")
-        print("   - POST /predict     - Make prediction")
-        
-        if not is_production:
-            print(f"\n⚠️  Make sure Laravel .env has: PYTHON_API_URL=http://127.0.0.1:{port}")
-        
-        print("=" * 70)
-        
-        # Production: bind to 0.0.0.0, Development: bind to 127.0.0.1
-        host = '0.0.0.0' if is_production else '127.0.0.1'
-        debug = not is_production
-        
-        app.run(host=host, port=port, debug=debug)
+    # Try to load models, but start server anyway
+    load_models()
+    
+    port = int(os.environ.get('PORT', 5000))
+    is_production = os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('RENDER')
+    
+    print("\n🚀 Starting Flask API server...")
+    if is_production:
+        print(f"📍 Production mode - Port: {port}")
     else:
-        print("\n❌ Failed to load models. Please check:")
-        print("   1. Models are exported from Google Colab")
-        print("   2. Files are placed in: app/Services/ML/")
-        print("   3. Required files:")
-        print("      - rf_readiness_model.pkl")
-        print("      - label_encoder_seed.pkl")
-        print("      - label_encoder_soil.pkl")
-        print("\nExiting...")
+        print(f"📍 Development mode - API at: http://127.0.0.1:{port}")
+    
+    print("📡 Endpoints:")
+    print("   - GET  /health      - Health check")
+    print("   - GET  /model-info  - Model information")
+    print("   - POST /predict     - Make prediction")
+    
+    if not is_production:
+        print(f"\n⚠️  Make sure Laravel .env has: PYTHON_API_URL=http://127.0.0.1:{port}")
+    
+    if not model_loaded:
+        print("\n⚠️  WARNING: Models not loaded, API will return errors")
+        print("   Check logs above for details")
+    
+    print("=" * 70)
+    
+    # Production: bind to 0.0.0.0, Development: bind to 127.0.0.1
+    host = '0.0.0.0' if is_production else '127.0.0.1'
+    debug = not is_production
+    
+    # Always start the server, even if models didn't load
+    app.run(host=host, port=port, debug=debug)
 
