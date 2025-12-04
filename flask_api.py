@@ -239,10 +239,10 @@ def predict():
         height_in = float(data['avg_height_in'])
         
         # Validate inputs
-        if height_in <= 0:
+        if height_in < 0:
             return jsonify({
                 'success': False,
-                'error': 'Height must be greater than 0. Please record plant height first.'
+                'error': 'Height cannot be negative.'
             }), 400
         
         # Validate seed type and soil type
